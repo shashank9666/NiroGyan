@@ -1,82 +1,72 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import AppointmentForm from '../components/AppointmentForm';
+import axios from 'axios';
 
 const DoctorProfile = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/doctors/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Doctor not found");
-        return res.json();
-      })
-      .then((data) => {
-        setDoctor(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+    const fetchDoctor = async () => {
+      try {
+        const response = await axios.get(`/api/doctors/${id}`);
+        setDoctor(response.data);
+      } catch (err) {
+        setError('Failed to load doctor details');
         console.error(err);
-        navigate("/not-found"); // redirect if 404
-      });
-  }, [id, navigate]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDoctor();
+  }, [id]);
 
-  if (loading) return <div className="text-center mt-10">Loading doctor info...</div>;
+  if (loading) return <div className="text-center py-8">Loading...</div>;
+  if (error) return <div className="text-center py-8 text-red-500">{error}</div>;
+  if (!doctor) return <div className="text-center py-8">Doctor not found</div>;
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 px-4">
-      <div className="bg-white shadow-md rounded p-6">
-        <div className="flex items-center space-x-4">
-          <img
-            src={doctor.image}
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="md:w-1/3">
+          <img 
+            src={doctor.profileImage} 
             alt={doctor.name}
-            className="w-24 h-24 rounded-full object-cover"
+            className="w-full rounded-lg shadow-md"
           />
-          <div>
-            <h2 className="text-2xl font-bold">{doctor.name}</h2>
-            <p className="text-gray-600">{doctor.specialization}</p>
-            <p className="mt-2">
-              <span className="font-semibold">Availability:</span>{" "}
-              {doctor.availability}
-            </p>
+          <h1 className="text-2xl font-bold mt-4">{doctor.name}</h1>
+          <p className="text-blue-600 font-medium">{doctor.specialization}</p>
+          <div className="mt-4">
+            <h2 className="text-lg font-semibold">Availability</h2>
+            <ul className="mt-2 space-y-1">
+              {Object.entries(doctor.schedule).map(([day, time]) => (
+                time && (
+                  <li key={day} className="flex justify-between">
+                    <span className="capitalize">{day}:</span>
+                    <span>{time}</span>
+                  </li>
+                )
+              ))}
+            </ul>
+          </div>
+          <div className="mt-4">
+            <span className={`px-3 py-1 rounded-full text-sm ${
+              doctor.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            }`}>
+              {doctor.available ? 'Currently Available' : 'Not Available'}
+            </span>
           </div>
         </div>
-
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">Book an Appointment</h3>
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert("Appointment request submitted!");
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Patient Name"
-              required
-              className="w-full p-2 border rounded"
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              required
-              className="w-full p-2 border rounded"
-            />
-            <input
-              type="datetime-local"
-              required
-              className="w-full p-2 border rounded"
-            />
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Confirm Booking
-            </button>
-          </form>
+        <div className="md:w-2/3">
+          <h2 className="text-xl font-semibold mb-4">About Dr. {doctor.name.split(' ')[1]}</h2>
+          <p className="text-gray-700 mb-6">{doctor.bio}</p>
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">Book an Appointment</h3>
+            <AppointmentForm doctorId={doctor._id} />
+          </div>
         </div>
       </div>
     </div>

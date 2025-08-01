@@ -1,39 +1,41 @@
 const express = require('express');
 const router = express.Router();
-const Appointment = require('../models/appointment.model');
+const Appointment = require('../models/Appointment');
+const Doctor = require('../models/Doctor');
 
-// POST new appointment
+// Book appointment
 router.post('/', async (req, res) => {
-  const { doctorId, patientName, appointmentDate, reason } = req.body;
-
-  if (!doctorId || !patientName || !appointmentDate || !reason) {
-    return res.status(400).json({ error: 'All fields are required.' });
-  }
+  const { doctorId, patientName, appointmentDate, timeSlot, reason } = req.body;
 
   try {
+    // Check doctor availability
+    const doctor = await Doctor.findById(doctorId);
+    if (!doctor || !doctor.available) {
+      return res.status(400).json({ message: 'Doctor not available' });
+    }
+
     const newAppointment = new Appointment({
       doctorId,
       patientName,
       appointmentDate,
-      reason,
+      timeSlot,
+      reason
     });
 
     await newAppointment.save();
-    res.status(201).json({ message: '✅ Appointment booked successfully' });
-  } catch (error) {
-    console.error('❌ Error saving appointment:', error);
-    res.status(500).json({ error: 'Failed to book appointment' });
+    res.status(201).json(newAppointment);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
-// GET all appointments (optional)
+// Get all appointments
 router.get('/', async (req, res) => {
   try {
     const appointments = await Appointment.find().populate('doctorId');
     res.json(appointments);
-  } catch (error) {
-    console.error('❌ Error fetching appointments:', error);
-    res.status(500).json({ error: 'Failed to fetch appointments' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
