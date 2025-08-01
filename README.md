@@ -1,18 +1,17 @@
 # NirogGyan - Healthcare Appointment Booking Web Application
 
----
 
 ## 🏥 Project Overview
 
 **NirogGyan** is a responsive healthcare appointment booking web application. It allows users to browse available doctors, view their profiles, and book appointments seamlessly. Built using **React** and styled with **Tailwind CSS**, the app is optimized for user-friendliness and responsiveness across devices.
 
----
+
 
 ## 🎯 Assignment Objective
 
 The goal of this assignment was to create a simple, clean, and intuitive user interface for booking healthcare appointments. It showcases doctor listings, individual doctor profiles, and a working appointment form.
 
----
+
 
 ## 🧩 Features
 
@@ -30,7 +29,6 @@ The goal of this assignment was to create a simple, clean, and intuitive user in
    - Collects patient name, email, and desired appointment date & time.
    - Displays a confirmation message upon successful booking.
 
----
 
 ## 🚀 Technologies Used
 
@@ -41,7 +39,7 @@ The goal of this assignment was to create a simple, clean, and intuitive user in
 | Language    | JavaScript (TypeScript optional) |
 | Utilities   | Axios, React Router DOM, dotenv, cors |
 
----
+
 
 ## 🧪 Optional Enhancements Implemented
 
@@ -50,7 +48,7 @@ The goal of this assignment was to create a simple, clean, and intuitive user in
 - ✅ Form validation for user inputs (email, date/time).
 - ✅ Fully responsive across mobile, tablet, and desktop devices.
 
----
+
 
 ## 🧠 Challenges Faced & Solutions
 
